@@ -12,7 +12,7 @@
         href="{{ asset('library/bootstrap/dist/css/bootstrap.min.css') }}">
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
-        integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+        xintegrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
         crossorigin="anonymous"
         referrerpolicy="no-referrer" />
 
@@ -23,39 +23,27 @@
         href="{{ asset('css/style.css') }}">
     <link rel="stylesheet"
         href="{{ asset('css/components.css') }}">
-
-    <!-- Start GA -->
-    <script async
-        src="https://www.googletagmanager.com/gtag/js?id=UA-94034622-3"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-        gtag('js', new Date());
-
-        gtag('config', 'UA-94034622-3');
-    </script>
-    <!-- END GA -->
-</head>
 </head>
 
 <body>
     <div id="app">
-        <div class="main-wrapper">
-            <!-- Header -->
-            @include('components.header')
+        @auth
+            <div class="main-wrapper">
+                @include('components.header')
+                @include('components.sidebar')
 
-            <!-- Sidebar -->
-            @include('components.sidebar')
+                <div class="main-content">
+                    <section class="section">
+                        @yield('content')
+                    </section>
+                </div>
+                @include('components.footer')
+            </div>
+        @endauth
 
-            <!-- Content -->
-            @yield('main')
-
-            <!-- Footer -->
-            @include('components.footer')
-        </div>
+        @guest
+            @yield('content')
+        @endguest
     </div>
 
     <!-- General JS Scripts -->
@@ -72,6 +60,9 @@
     <!-- Template JS File -->
     <script src="{{ asset('js/scripts.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
+
+    {{-- PENAMBAHAN: Menarik semua modal yang di-push ke sini --}}
+    @stack('modals')
 </body>
 
 </html>

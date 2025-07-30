@@ -1,0 +1,60 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Aset extends Model
+{
+    use HasFactory;
+
+    // Karena kita menggunakan string sebagai primary key, kita perlu mendefinisikannya
+    protected $primaryKey = 'kode_tag';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
+    protected $guarded = []; // Izinkan mass assignment untuk semua field
+
+    // Relasi ke Kategori
+    public function kategori()
+    {
+        return $this->belongsTo(Kategori::class);
+    }
+    
+
+    // Relasi ke Status Aset
+    public function status()
+    {
+        return $this->belongsTo(StatusAset::class, 'status_id');
+    }
+
+    // Relasi ke Vendor
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class);
+    }
+    
+    // Relasi ke Riwayat Service
+    public function riwayatServices()
+    {
+        return $this->hasMany(RiwayatService::class, 'aset_kode_tag', 'kode_tag');
+    }
+
+    // Relasi ke Histori Pemakaian
+    public function historiPemakaians()
+    {
+        return $this->hasMany(HistoriPemakaian::class, 'aset_kode_tag', 'kode_tag');
+    }
+    
+    public function statusAset()
+    {
+        // Nama model yang berhubungan adalah StatusAset
+        // Foreign key di tabel 'asets' adalah 'status_id'
+        return $this->belongsTo(StatusAset::class, 'status_id');
+    }
+    public function pemegangTerakhir()
+    {
+        return $this->hasOne(HistoriPemakaian::class, 'aset_kode_tag', 'kode_tag')->latest('tanggal_serah');
+    }
+}

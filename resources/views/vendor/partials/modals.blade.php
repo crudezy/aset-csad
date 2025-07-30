@@ -1,0 +1,68 @@
+{{-- Modal Tambah Vendor --}}
+<div class="modal fade" tabindex="-1" role="dialog" id="modal-tambah-vendor">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Vendor Baru</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ route('vendor.store') }}" method="POST" class="needs-validation" novalidate="">
+                @csrf
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Nama Vendor</label>
+                        <input type="text" name="nama_vendor" class="form-control" required="">
+                        <div class="invalid-feedback">
+                            Nama vendor tidak boleh kosong.
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Kontak (Opsional)</label>
+                        <input type="text" name="kontak" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Edit Vendor --}}
+<div class="modal fade" tabindex="-1" role="dialog" id="modal-edit-vendor">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Vendor</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="form-edit-vendor" method="POST" class="needs-validation" novalidate="">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                     <div class="form-group">
+                        <label>Nama Vendor</label>
+                        <input type="text" name="nama_vendor" id="edit-nama_vendor" class="form-control" required="">
+                        <div class="invalid-feedback">
+                           Nama vendor tidak boleh kosong.
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Kontak (Opsional)</label>
+                        <input type="text" name="kontak" id="edit-kontak" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
