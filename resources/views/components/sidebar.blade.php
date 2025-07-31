@@ -4,7 +4,7 @@
             <a href="index.html">Aset</a>
         </div>
         <div class="sidebar-brand sidebar-brand-sm">
-            <a href="index.html">St</a>
+            <a href="index.html">CSAD</a>
         </div>
         <ul class="sidebar-menu">
             <li class="menu-header">Dashboard</li>
@@ -38,9 +38,8 @@
                 </ul>
             </li>
 
-            {{-- Tambahkan link Pegawai di sini --}}
             <li class="{{ Request::is('pegawai*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('pegawai.index') }}"><i class="fas fa-users"></i> <span>Pegawai</span></a>
+                <a class="nav-link" href="{{ route('pegawai.index') }}"><i class="fas fa-users"></i> <span>Karyawan</span></a>
             </li>
             <li class="{{ Request::is('aset*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('aset.index') }}"><i class="fas fa-box"></i> <span>Aset</span></a>

@@ -11,10 +11,10 @@
 
 @section('content')
     <div class="section-header">
-        <h1>Pegawai</h1>
+        <h1>Karyawan</h1>
         <div class="section-header-breadcrumb">
             <div class="breadcrumb-item active"><a href="#">Dashboard</a></div>
-            <div class="breadcrumb-item">Pegawai</div>
+            <div class="breadcrumb-item">Karyawan</div>
         </div>
     </div>
 
@@ -93,9 +93,6 @@
         $(document).ready(function() {
             $('#table-pegawai').DataTable({"language": {"url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Indonesian.json"}});
 
-            // =================================================================
-            // PERBAIKAN: Inisialisasi Select2 dengan fitur tagging
-            // =================================================================
             function initializeSelect2WithTags(modal) {
                 modal.find('.select2-tags').select2({
                     tags: true, // Ini akan mengaktifkan fitur "ketik baru"

@@ -40,7 +40,7 @@
                 <p>Kode Tag: <strong>{{ $aset->kode_tag }}</strong></p>
                 <p>Serial Number: {{ $aset->serial_number ?? 'N/A' }}</p>
                 {{-- Anda bisa menambahkan QR Code di sini menggunakan library QR code --}}
-                {{-- Contoh (jika menggunakan simple-qrcode): --}}
+                {{-- Contoh ( simple-qrcode): --}}
                 {{-- <div class="qr-code">
                     {!! QrCode::size(80)->generate(route('aset.show', $aset->kode_tag)) !!}
                 </div> --}}
@@ -52,10 +52,6 @@
         // Otomatis mencetak setelah halaman dimuat
         window.onload = function() {
             window.print();
-            // Optional: Tutup tab setelah mencetak (tidak selalu berfungsi di semua browser)
-            // window.onafterprint = function() {
-            //     window.close();
-            // };
         };
     </script>
 </body>

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no"
         name="viewport">
-    <title>@yield('title') &mdash; Stisla</title>
+    <title>@yield('title')</title>
 
     <!-- General CSS Files -->
     <link rel="stylesheet"
@@ -53,7 +53,7 @@
     <script src="{{ asset('library/bootstrap/dist/js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('library/jquery.nicescroll/dist/jquery.nicescroll.min.js') }}"></script>
     <script src="{{ asset('library/moment/min/moment.min.js') }}"></script>
-    <script src="{{ asset('js/stisla.js') }}"></script>
+    <script src="{{ asset('js/csad.js') }}"></script>
 
     @stack('scripts')
 
