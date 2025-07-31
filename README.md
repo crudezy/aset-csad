@@ -11,7 +11,6 @@
 
 <span align="center">
 
-**Laravel Stisla** is a Free Bootstrap Admin Template which will help you to speed up your project and design your own dashboard UI using Laravel blade templating engine.
 
 </span>
 

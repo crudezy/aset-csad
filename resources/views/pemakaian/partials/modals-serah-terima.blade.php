@@ -29,7 +29,7 @@
                     <div class="form-group">
                         <label for="pegawai_id_modal">Serahkan Kepada</label>
                         <select name="pegawai_id" id="pegawai_id_modal" class="form-control select2 @error('pegawai_id') is-invalid @enderror" required style="width: 100%;">
-                            <option value="">-- Pilih Pegawai --</option>
+                            <option value="">-- Pilih Karyawan --</option>
                             @foreach ($pegawais as $pegawai)
                                 <option value="{{ $pegawai->id }}" {{ old('pegawai_id') == $pegawai->id ? 'selected' : '' }}>
                                     {{ $pegawai->nama }}

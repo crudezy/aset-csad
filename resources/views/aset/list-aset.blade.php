@@ -3,7 +3,6 @@
 @section('title', 'Data Aset')
 
 @push('style')
-    <!-- CSS Libraries -->
     <link rel="stylesheet" href="{{ asset('library/select2/dist/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('library/izitoast/dist/css/iziToast.min.css') }}">
     <link rel="stylesheet" href="{{ asset('library/datatables/media/css/jquery.dataTables.min.css') }}">
@@ -25,6 +24,12 @@
                     <div class="card-header">
                         <h4>Data Aset</h4>
                         <div class="card-header-action">
+                            <button type="submit" class="btn btn-warning mr-2" id="btn-cetak-terpilih" style="display: none;" form="form-cetak-label-multiple">
+                                <i class="fas fa-print"></i> Cetak Label
+                            </button>
+                            <a href="{{ route('aset.export.excel') }}" class="btn btn-success mr-2">
+                                <i class="fas fa-file-excel"></i> Export Excel
+                            </a>
                             <button class="btn btn-primary" data-toggle="modal" data-target="#modal-tambah-aset">
                                 <i class="fas fa-plus"></i> Tambah Baru
                             </button>
@@ -38,54 +43,65 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped" id="table-aset">
-                                <thead>
-                                    <tr>
-                                        <th class="text-center">No</th>
-                                        <th>Aset</th>
-                                        <th>Kategori</th>
-                                        <th>Status</th>
-                                        <th>Pegawai (PIC)</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($asets as $aset)
+                        {{-- Form untuk cetak label multiple sekarang hanya membungkus tabel --}}
+                        <form id="form-cetak-label-multiple" action="{{ route('aset.cetak.label.multiple') }}" method="POST" target="_blank">
+                            @csrf
+                            {{-- Bagian d-flex justify-content-between align-items-center mb-3 yang tadinya ada tombol sekarang dihapus --}}
+                            
+                            <div class="table-responsive">
+                                <table class="table table-striped" id="table-aset">
+                                    <thead>
                                         <tr>
-                                            <td class="text-center">{{ $loop->iteration }}</td>
-                                            <td>
-                                                <strong>{{ $aset->merk }} {{ $aset->type }}</strong><br>
-                                                <small><code>{{ $aset->kode_tag }}</code> / <code>{{ $aset->serial_number ?? 'N/A' }}</code></small>
-                                            </td>
-                                            <td>{{ $aset->kategori->nama }}</td>
-                                            <td>
-                                                <x-status-badge :status="$aset->statusAset->nama" />
-                                            </td>
-                                            <td>
-                                                @if($aset->pemegangTerakhir && !$aset->pemegangTerakhir->tanggal_kembali)
-                                                    {{ $aset->pemegangTerakhir->pegawai->nama }}
-                                                @else
-                                                    -
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <a href="{{ route('aset.show', $aset->kode_tag) }}" class="btn btn-secondary btn-sm">Detail</a>
-                                                <button class="btn btn-warning btn-sm btn-edit" data-aset='@json($aset)'>Edit</button>
-                                                
-                                                @if (strtolower($aset->statusAset->nama) != 'digunakan')
-                                                    <form action="{{ route('aset.destroy', $aset->kode_tag) }}" method="POST" class="d-inline">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button class="btn btn-danger btn-sm confirm-delete">Hapus</button>
-                                                    </form>
-                                                @endif
-                                            </td>
+                                            {{-- Kolom Checkbox untuk Pilih Semua --}}
+                                            <th class="text-center" style="width: 5%;"><input type="checkbox" id="checkbox-all-aset"></th>
+                                            <th class="text-center">No</th>
+                                            <th>Aset</th>
+                                            <th>Kategori</th>
+                                            <th>Status</th>
+                                            <th>Pegawai (PIC)</th>
+                                            <th>Aksi</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($asets as $aset)
+                                            <tr>
+                                                <td class="text-center">
+                                                    {{-- Checkbox individual untuk aset --}}
+                                                    <input type="checkbox" class="checkbox-item-aset" name="kode_tags[]" value="{{ $aset->kode_tag }}">
+                                                </td>
+                                                <td class="text-center">{{ $loop->iteration }}</td>
+                                                <td>
+                                                    <strong>{{ $aset->merk }} {{ $aset->type }}</strong><br>
+                                                    <small><code>{{ $aset->kode_tag }}</code> / <code>{{ $aset->serial_number ?? 'N/A' }}</code></small>
+                                                </td>
+                                                <td>{{ $aset->kategori->nama }}</td>
+                                                <td>
+                                                    <x-status-badge :status="$aset->statusAset->nama" />
+                                                </td>
+                                                <td>
+                                                    @if($aset->pemegangTerakhir && !$aset->pemegangTerakhir->tanggal_kembali)
+                                                        {{ $aset->pemegangTerakhir->pegawai->nama }}
+                                                    @else
+                                                        -
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    <a href="{{ route('aset.show', $aset->kode_tag) }}" class="btn btn-secondary btn-sm">Detail</a>
+                                                    <button class="btn btn-warning btn-sm btn-edit" data-aset='@json($aset)'>Edit</button>
+                                                    
+                                                    @if (strtolower($aset->statusAset->nama) != 'digunakan')
+                                                        <form action="{{ route('aset.destroy', $aset->kode_tag) }}" method="POST" class="d-inline">
+                                                            @csrf
+                                                            <button class="btn btn-danger btn-sm confirm-delete">Hapus</button>
+                                                        </form>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form> {{-- Tutup form cetak label multiple --}}
                     </div>
                 </div>
             </div>
@@ -93,28 +109,40 @@
     </div>
 @endsection
 
-{{-- PERBAIKAN: Kode modal sekarang di "push" ke stack bernama 'modals' --}}
+
 @push('modals')
     @include('aset.partials.modals')
+    {{-- @include('aset.partials.modal-cetak-label') --}}
 @endpush
 
 @push('scripts')
-    <!-- JS Libraies -->
     <script src="{{ asset('library/select2/dist/js/select2.full.min.js') }}"></script>
     <script src="{{ asset('library/izitoast/dist/js/iziToast.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('library/datatables/media/js/jquery.dataTables.min.js') }}"></script>
 
-    <!-- Page Specific JS File -->
     <script>
         $(document).ready(function() {
-            $('#table-aset').DataTable({ "language": { "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Indonesian.json" } });
+            $('#table-aset').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Indonesian.json"
+                },
+                // Tambahkan columnDefs untuk menghilangkan sorting pada kolom checkbox
+                "columnDefs": [
+                    { "targets": 0, "orderable": false }
+                ]
+            });
 
-            $('.modal').on('shown.bs.modal', function () { $(this).find('.select2').select2({ dropdownParent: $(this) }); });
+            $('.modal').on('shown.bs.modal', function () {
+                $(this).find('.select2').select2({
+                    dropdownParent: $(this)
+                });
+            });
 
             @if (session('success')) iziToast.success({ title: 'Berhasil!', message: '{{ session('success') }}', position: 'topRight' }); @endif
             @if (session('error')) iziToast.error({ title: 'Gagal!', message: '{{ session('error') }}', position: 'topRight' }); @endif
 
+            // Logic untuk tombol Edit Aset (sama seperti sebelumnya)
             $('#table-aset tbody').on('click', '.btn-edit', function() {
                 var aset = $(this).data('aset');
                 var form = $('#form-edit-aset');
@@ -129,9 +157,12 @@
                 form.find('#edit-vendor_id').val(aset.vendor_id).trigger('change');
                 form.find('#edit-spesifikasi').val(aset.spesifikasi);
                 form.find('#edit-keterangan').val(aset.keterangan);
+                // Jika ada gambar, tampilkan preview atau isi field gambar lama
+                // form.find('#gambar-preview-edit').attr('src', aset.gambar ? '{{ asset('storage') }}/' + aset.gambar : 'https://placehold.co/100x100');
                 $('#modal-edit-aset').modal('show');
             });
 
+            // Logic untuk konfirmasi hapus individual
             $('#table-aset tbody').on('click', '.confirm-delete', function(e) {
                 e.preventDefault();
                 var form = $(this).closest('form');
@@ -142,6 +173,7 @@
                 }).then((result) => { if (result.isConfirmed) { form.submit(); } });
             });
 
+            // Logic untuk konfirmasi hapus semua
             $('.confirm-delete-all').on('click', function(e) {
                 e.preventDefault();
                 var form = $(this).closest('form');
@@ -161,6 +193,7 @@
                 });
             });
 
+            // Handle errors for modals
             @if ($errors->any())
                 @if (old('form_type') === 'edit_aset')
                     $('#modal-edit-aset').modal('show');
@@ -168,6 +201,67 @@
                     $('#modal-tambah-aset').modal('show');
                 @endif
             @endif
+
+            // --- Logika Checkbox dan Tombol Cetak Label Terpilih ---
+            function toggleCetakLabelButton() {
+                var checkedCount = $('.checkbox-item-aset:checked').length;
+                if (checkedCount > 0) {
+                    $('#btn-cetak-terpilih').fadeIn('fast');
+                } else {
+                    $('#btn-cetak-terpilih').fadeOut('fast');
+                }
+            }
+
+            // Pilih Semua Checkbox
+            $('#checkbox-all-aset').on('change', function() {
+                var isChecked = $(this).is(':checked');
+                $('.checkbox-item-aset').prop('checked', isChecked).trigger('change');
+            });
+
+            // Checkbox Individual
+            $('#table-aset tbody').on('change', '.checkbox-item-aset', function() {
+                toggleCetakLabelButton();
+                // Jika ada item yang tidak terpilih, uncheck 'pilih semua'
+                if (!$(this).is(':checked')) {
+                    $('#checkbox-all-aset').prop('checked', false);
+                } else {
+                    // Jika semua item terpilih, check 'pilih semua'
+                    if ($('.checkbox-item-aset:checked').length === $('.checkbox-item-aset').length) {
+                        $('#checkbox-all-aset').prop('checked', true);
+                    }
+                }
+            });
+
+            // Tombol Cetak Label Terpilih (mengirimkan form)
+            $('#btn-cetak-terpilih').on('click', function(e) {
+                e.preventDefault();
+                var form = $('#form-cetak-label-multiple');
+                var checkedCount = form.find('input[name="kode_tags[]"]:checked').length;
+                if (checkedCount === 0) {
+                    Swal.fire('Perhatian!', 'Pilih setidaknya satu aset untuk dicetak labelnya.', 'warning');
+                    return;
+                }
+                
+                // Memicu submit form. Karena target="_blank", akan membuka di tab baru.
+                form.submit();
+
+                // Optional: reset checkboxes setelah cetak
+                Swal.fire({
+                    title: 'Pencetakan Dimulai',
+                    text: 'Silakan cek tab baru untuk hasil cetak.',
+                    icon: 'info',
+                    showConfirmButton: false,
+                    timer: 3000 // Tutup otomatis setelah 3 detik
+                });
+                $('.checkbox-item-aset').prop('checked', false);
+                $('#checkbox-all-aset').prop('checked', false);
+                toggleCetakLabelButton(); // Sembunyikan tombol setelah aksi
+            });
+
+
+
+            // Inisialisasi awal tombol
+            toggleCetakLabelButton();
         });
     </script>
 @endpush

@@ -11,6 +11,10 @@ use App\Models\HistoriPemakaian;
 use App\Models\RiwayatService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Exports\AsetsExport; 
+use Maatwebsite\Excel\Facades\Excel; 
+
+
 
 class AsetController extends Controller
 {
@@ -160,4 +164,25 @@ class AsetController extends Controller
 
         return redirect()->route('aset.index')->with('success', 'Semua data aset berhasil dihapus.');
     }
+    public function exportExcel()
+    {
+        // Panggil class AsetsExport dan tentukan nama file yang akan diunduh
+        return Excel::download(new AsetsExport, 'laporan-data-aset.xlsx');
+    }
+    public function cetakLabelMultiple(Request $request)
+    {
+        $selectedKodeTags = $request->input('kode_tags'); // Ini akan menjadi array kode_tag yang dipilih
+
+        if (empty($selectedKodeTags)) {
+            return back()->with('error', 'Tidak ada aset yang dipilih untuk dicetak labelnya.');
+        }
+
+        // Ambil data aset berdasarkan kode_tag yang dipilih
+        $asetsToPrint = Aset::whereIn('kode_tag', $selectedKodeTags)->get();
+
+        // Contoh sederhana: Mengarahkan ke view yang bisa Anda desain untuk cetak
+        return view('aset.cetak-label', compact('asetsToPrint'));
+    }
+
+    
 }

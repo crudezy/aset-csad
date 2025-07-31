@@ -55,6 +55,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('pegawai', PegawaiController::class);
     Route::delete('aset/hapus-semua', [AsetController::class, 'destroyAll'])->name('aset.destroyAll');
     Route::resource('aset', AsetController::class);
+    Route::get('/aset/export/excel', [AsetController::class, 'exportExcel'])->name('aset.export.excel');
+    Route::post('/asets/cetak-label/multiple', [AsetController::class, 'cetakLabelMultiple'])->name('aset.cetak.label.multiple');
+    
 
     // Route Resource untuk Transaksi
     Route::get('/riwayat-service/search-aset', [RiwayatServiceController::class, 'searchAset'])->name('riwayat-service.searchAset');

@@ -21,7 +21,7 @@
                     <div class="form-group">
                         <label for="vendor_id_tambah">Vendor Service (Opsional)</label>
                         {{-- PERBAIKAN: Tambahkan kelas select2-tags --}}
-                        <select class="form-control select2-tags" id="vendor_id_tambah" name="vendor_id" style="width: 100%;">
+                        <select class="select2-tags" id="vendor_id_tambah" name="vendor_id" style="width: 100%;">
                             <option value="">Pilih atau ketik baru</option>
                             @foreach ($vendors as $vendor)
                                 <option value="{{ $vendor->id }}">{{ $vendor->nama_vendor }}</option>

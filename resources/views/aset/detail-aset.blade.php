@@ -3,6 +3,7 @@
 @section('title', 'Detail Aset - ' . $aset->kode_tag)
 
 @push('style')
+    <link rel="stylesheet" href="{{ asset('library/select2/dist/css/select2.min.css') }}">
     <style>
         .asset-title {
             font-size: 1.8rem;
@@ -223,15 +224,29 @@
             const dd = String(today.getDate()).padStart(2, '0');
             const formattedToday = `${yyyy}-${mm}-${dd}`;
 
+            // --- AWAL BAGIAN BARU ---
+            // Inisialisasi Select2 saat modal ditampilkan
+            $('#modal-tambah-service').on('shown.bs.modal', function () {
+                // Inisialisasi dropdown vendor agar bisa diketik (tagging)
+                $(this).find('.select2-tags').select2({
+                    tags: true,
+                    dropdownParent: $(this) // Penting agar dropdown muncul di atas modal
+                });
+            });
+            // --- AKHIR BAGIAN BARU ---
+
             $('#btn-tambah-service-detail').on('click', function() {
                 var asetData = @json($aset);
                 var optionText = `${asetData.merk} ${asetData.type} (${asetData.kode_tag})`;
                 var option = new Option(optionText, asetData.kode_tag, true, true);
                 
+                // Reset form dan isian lainnya
+                $('#modal-tambah-service form')[0].reset();
                 $('#aset_kode_tag_tambah').empty().append(option).trigger('change');
                 $('#hidden_aset_kode_tag_tambah').val(asetData.kode_tag);
                 $('#aset_kode_tag_tambah').prop('disabled', true);
                 $('#tanggal_masuk_service_tambah').val(formattedToday);
+                $('#vendor_id_tambah').val(null).trigger('change'); // Reset vendor
 
                 $('#modal-tambah-service').modal('show');
             });
@@ -239,8 +254,14 @@
             $('#modal-tambah-service').on('hidden.bs.modal', function () {
                 $('#aset_kode_tag_tambah').prop('disabled', false).empty();
                 $('#hidden_aset_kode_tag_tambah').val('');
+                
+                // Hancurkan instance select2 agar tidak konflik
+                if ($('#vendor_id_tambah').hasClass('select2-hidden-accessible')) {
+                    $('#vendor_id_tambah').select2('destroy');
+                }
             });
 
+            // Kode untuk tombol "Selesaikan Service" (tidak perlu diubah)
             $(document).on('click', '.btn-selesaikan', function() {
                 const service = $(this).data('service');
                 const aset = $(this).data('aset');
