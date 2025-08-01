@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Tambah Pegawai Baru</h5>
+                <h5 class="modal-title">Tambah Karyawan Baru</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -11,9 +11,9 @@
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Nama Pegawai</label>
+                        <label>Nama Karyawan</label>
                         <input type="text" name="nama" class="form-control" required="">
-                        <div class="invalid-feedback">Nama pegawai tidak boleh kosong.</div>
+                        <div class="invalid-feedback">Nama karyawan tidak boleh kosong.</div>
                     </div>
                     <div class="form-group">
                         <label>Email (Opsional)</label>
@@ -60,7 +60,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Edit Pegawai</h5>
+                <h5 class="modal-title">Edit Karyawan</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -70,9 +70,9 @@
                 @method('PUT')
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Nama Pegawai</label>
+                        <label>Nama Karyawan</label>
                         <input type="text" name="nama" id="edit-nama" class="form-control" required="">
-                        <div class="invalid-feedback">Nama pegawai tidak boleh kosong.</div>
+                        <div class="invalid-feedback">Nama karyawan tidak boleh kosong.</div>
                     </div>
                     <div class="form-group">
                         <label>Email (Opsional)</label>

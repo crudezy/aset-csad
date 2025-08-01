@@ -87,7 +87,7 @@
                                                 </td>
                                                 <td>
                                                     <a href="{{ route('aset.show', $aset->kode_tag) }}" class="btn btn-secondary btn-sm">Detail</a>
-                                                    <button class="btn btn-warning btn-sm btn-edit" data-aset='@json($aset)'>Edit</button>
+                                                    <button type="button" class="btn btn-warning btn-sm btn-edit" data-aset='@json($aset)'>Edit</button>
                                                     
                                                     @if (strtolower($aset->statusAset->nama) != 'digunakan')
                                                         <form action="{{ route('aset.destroy', $aset->kode_tag) }}" method="POST" class="d-inline">
@@ -102,7 +102,7 @@
                                 </table>
                             </div>
                         </form> {{-- Tutup form cetak label multiple --}}
-                    </div>
+                    </div>   
                 </div>
             </div>
         </div>
@@ -112,7 +112,6 @@
 
 @push('modals')
     @include('aset.partials.modals')
-    {{-- @include('aset.partials.modal-cetak-label') --}}
 @endpush
 
 @push('scripts')
@@ -127,7 +126,7 @@
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Indonesian.json"
                 },
-                // Tambahkan columnDefs untuk menghilangkan sorting pada kolom checkbox
+                // Tambahkan columnDefs untuk menghilangkan sorting pada 
                 "columnDefs": [
                     { "targets": 0, "orderable": false }
                 ]
