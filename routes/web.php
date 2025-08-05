@@ -28,7 +28,7 @@ Auth::routes();
 Route::get('/', function () {
     return redirect()->route('dashboard.index');
 });
-
+    
 // 3. Semua route aplikasi sekarang berada di dalam grup middleware 'auth'.
 //    Ini memastikan hanya pengguna yang sudah login yang dapat mengakses halaman-halaman ini.
 Route::middleware(['auth'])->group(function () {
@@ -44,7 +44,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Halaman Gabungan Master Data
     Route::get('/master-data', [MasterDataController::class, 'index'])->name('master-data.index');
-    
+
     // Route Resource untuk Master Data (Create, Store, Update, Destroy)
     Route::resource('kategori', KategoriController::class);
     Route::resource('vendor', VendorController::class);
@@ -57,7 +57,6 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('aset', AsetController::class);
     Route::get('/aset/export/excel', [AsetController::class, 'exportExcel'])->name('aset.export.excel');
     Route::post('/asets/cetak-label/multiple', [AsetController::class, 'cetakLabelMultiple'])->name('aset.cetak.label.multiple');
-    
 
     // Route Resource untuk Transaksi
     Route::get('/riwayat-service/search-aset', [RiwayatServiceController::class, 'searchAset'])->name('riwayat-service.searchAset');

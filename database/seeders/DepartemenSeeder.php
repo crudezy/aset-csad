@@ -21,7 +21,5 @@ class DepartemenSeeder extends Seeder
         Departemen::create(['nama' => 'IT']);
         Departemen::create(['nama' => 'Finance & Accounting']);
         Departemen::create(['nama' => 'Human Resources']);
-        Departemen::create(['nama' => 'Marketing']);
-        Departemen::create(['nama' => 'Operasional']);
     }
 }

@@ -29,8 +29,8 @@ return new class extends Migration
             $table->foreignId('kategori_id')->constrained('kategoris')->onUpdate('cascade'); 
             $table->foreignId('status_id')->constrained('status_asets')->onUpdate('cascade');
             $table->foreignId('vendor_id')->nullable()->constrained('vendors')->onUpdate('cascade')->onDelete('set null');
-            // $table->foreignId('pic_id')->nullable()->constrained('pegawais')->onUpdate('cascade')->onDelete('set null');
-            
+            $table->unsignedBigInteger('department_id')->nullable();
+            $table->foreign('department_id')->references('id')->on('departemens')->onDelete('set null');
             $table->timestamps();
         });
     }

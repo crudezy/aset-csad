@@ -26,8 +26,7 @@ class DatabaseSeeder extends Seeder
             LokasiSeeder::class,
             DepartemenSeeder::class,
             StatusAsetSeeder::class,
-            VendorSeeder::class, // Pastikan Anda juga punya seeder untuk Vendor
-            // Panggil seeder aset yang baru
+            VendorSeeder::class, 
             AsetSeeder::class,
         ]);
     }

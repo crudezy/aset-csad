@@ -1,9 +1,9 @@
-@extends('layouts.app')
+<!-- @extends('layouts.app')
 
 @section('title', 'Register')
 
 @push('style')
-    <!-- CSS Libraries -->
+     CSS Libraries
     <link rel="stylesheet"
         href="{{ asset('library/selectric/public/selectric.css') }}">
 @endpush
@@ -75,8 +75,8 @@
 @endsection
 
 @push('scripts')
-    <!-- JS Libraies -->
+     JS Libraies
     <script src="{{ asset('library/selectric/public/jquery.selectric.min.js') }}"></script>
 
-    <!-- Page Specific JS File -->
-@endpush
+     Page Specific JS File
+@endpush -->

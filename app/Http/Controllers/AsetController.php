@@ -23,7 +23,10 @@ class AsetController extends Controller
      */
     public function index()
     {
-        $asets = Aset::with(['kategori', 'statusAset', 'pemegangTerakhir.pegawai'])->latest()->get();
+        $asets = Aset::with(['kategori', 'statusAset', 'pemegangTerakhir.pegawai'])
+            ->where('department_id', auth()->user()->department_id)
+            ->latest()
+            ->get();
         
         $kategoris = Kategori::orderBy('nama')->get();
         $statusAsets = StatusAset::all();
@@ -75,6 +78,7 @@ class AsetController extends Controller
         }
 
         $validated['kode_tag'] = $newKodeTag;
+        $validated['department_id'] = auth()->user()->department_id;
         Aset::create($validated);
 
         return redirect()->route('aset.index')->with('success', 'Aset berhasil ditambahkan.');

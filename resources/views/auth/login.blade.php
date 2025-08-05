@@ -66,9 +66,6 @@
                             </form>
                         </div>
                     </div>
-                    <div class="mt-5 text-muted text-center">
-                        Belum punya akun? <a href="{{ route('register') }}">Buat Akun</a>
-                    </div>
                 </div>
             </div>
         </div>
