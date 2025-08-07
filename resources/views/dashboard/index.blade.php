@@ -3,15 +3,14 @@
 @section('title', 'Dashboard')
 
 @push('style')
-    {{-- CSS tambahan untuk dashboard jika ada --}}
+    {{-- CSS Libraries can be added here if needed --}}
 @endpush
 
-{{-- Menggunakan @section('content') dan menghapus div 'main-content' & 'section' yang berlebih --}}
 @section('content')
     <div class="section-header">
         <h1>Dashboard</h1>
     </div>
-    
+
     {{-- KARTU INDIKATOR (KPI) --}}
     <div class="row">
         <div class="col-lg-3 col-md-6 col-sm-6 col-12">
@@ -153,7 +152,9 @@
 
     <script>
         $(document).ready(function() {
-            // Data untuk Pie Chart (Status Aset)
+            // =================================================================
+            // KODE FINAL UNTUK PIE CHART (STATUS ASET)
+            // =================================================================
             var statusLabels = {!! json_encode($statusLabels) !!};
             var statusCounts = {!! json_encode($statusCounts) !!};
             var statusAsetCtx = document.getElementById("statusAsetChart").getContext('2d');
@@ -162,11 +163,34 @@
                 data: {
                     datasets: [{
                         data: statusCounts,
-                        backgroundColor: ['#6777ef', '#63ed7a', '#fc544b', '#ffa426', '#868e96'],
+                        backgroundColor: ['#6777ef', '#63ed7a', '#fc544b', '#ffa426', '#343a40', '#868e96'],
+                        label: 'Jumlah Aset'
                     }],
                     labels: statusLabels,
                 },
-                options: { responsive: true, legend: { position: 'bottom' } }
+                options: {
+                    responsive: true,
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            filter: function(legendItem, chartData) {
+                                return chartData.datasets[0].data[legendItem.index] > 0;
+                            }
+                        }
+                    },
+                    tooltips: {
+                        callbacks: {
+                            filter: function(tooltipItem, data) {
+                                return data.datasets[0].data[tooltipItem.index] > 0;
+                            },
+                            label: function(tooltipItem, data) {
+                                var label = data.labels[tooltipItem.index] || '';
+                                var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                                return ' ' + label + ': ' + value;
+                            }
+                        }
+                    }
+                }
             });
 
             // Data untuk Bar Chart (Aset per Kategori)

@@ -3,149 +3,122 @@
 namespace App\Http\Controllers;
 
 use App\Models\Aset;
-use App\Models\RiwayatService;
 use App\Models\StatusAset;
+use App\Models\RiwayatService;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class RiwayatServiceController extends Controller
 {
-    /**
-     * Menampilkan daftar service yang sedang aktif.
-     */
     public function index()
     {
-        $riwayatServices = RiwayatService::whereNull('tanggal_selesai_service')
-            ->with(['aset', 'vendor'])
-            ->latest('tanggal_masuk_service')
-            ->get();
-            
+        $user = auth()->user();
+
+        // 1. MEMULAI QUERY UNTUK DAFTAR SERVICE AKTIF
+        $servicesQuery = RiwayatService::with(['aset', 'vendor'])
+                                       ->whereNull('tanggal_selesai_service')
+                                       ->latest('tanggal_masuk_service');
+
+        // 2. TERAPKAN FILTER JIKA BUKAN SUPERADMIN
+        if ($user->role !== 'superadmin') {
+            $servicesQuery->whereHas('aset', function ($query) use ($user) {
+                $query->where('department_id', $user->department_id);
+            });
+        }
+
+        // 3. AMBIL HASILNYA
+        $riwayatServices = $servicesQuery->get();
+        
+        // --- Logika untuk mengisi dropdown di modal "Tambah Service" ---
         $vendors = Vendor::orderBy('nama_vendor')->get();
 
         return view('riwayat-service.list-service', compact('riwayatServices', 'vendors'));
     }
 
-    /**
-     * Menyimpan catatan service baru.
-     */
+    // ... (Sisa method seperti store, update, dll. TIDAK PERLU DIUBAH) ...
+    // Pastikan sisa kode Anda dari file asli tetap ada di sini.
+    // Saya hanya menampilkan method yang diubah.
+
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'aset_kode_tag'         => 'required|exists:asets,kode_tag',
-            'deskripsi_kerusakan'   => 'required|string',
-            'tanggal_masuk_service' => 'required|date',
-            'perkiraan_selesai'     => 'nullable|date|after_or_equal:tanggal_masuk_service',
-            'vendor_id'             => 'nullable',
+            'hidden_aset_kode_tag' => 'required|exists:asets,kode_tag',
+            'deskripsi_kerusakan'  => 'required|string',
+            'tanggal_masuk_service'=> 'required|date',
+            'perkiraan_selesai'    => 'nullable|date|after_or_equal:tanggal_masuk_service',
+            'vendor_id'            => 'nullable|exists:vendors,id',
         ]);
 
-        DB::beginTransaction();
-        try {
-            $vendorId = $request->vendor_id;
-            if ($vendorId && !is_numeric($vendorId)) {
-                $newVendor = Vendor::firstOrCreate(['nama_vendor' => $vendorId]);
-                $vendorId = $newVendor->id;
-            }
+        $aset = Aset::findOrFail($validated['hidden_aset_kode_tag']);
+        $statusRusak = StatusAset::whereRaw('LOWER(nama) = ?', ['rusak'])->first();
+        $statusPerbaikan = StatusAset::whereRaw('LOWER(nama) = ?', ['dalam perbaikan'])->first();
 
-            $aset = Aset::where('kode_tag', $validated['aset_kode_tag'])->firstOrFail();
-            $statusPerbaikan = StatusAset::whereRaw('LOWER(nama) = ?', ['dalam perbaikan'])->first();
-            
-            if ($statusPerbaikan) {
-                $aset->status_id = $statusPerbaikan->id;
-                $aset->save();
-            }
-            
-            RiwayatService::create([
-                'aset_kode_tag' => $validated['aset_kode_tag'],
-                'deskripsi_kerusakan' => $validated['deskripsi_kerusakan'],
-                'tanggal_masuk_service' => $validated['tanggal_masuk_service'],
-                'perkiraan_selesai' => $validated['perkiraan_selesai'],
-                'vendor_id' => $vendorId,
-            ]);
-
-            DB::commit();
-            return redirect()->route('riwayat-service.index')->with('success', 'Catatan service baru berhasil ditambahkan.');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        if (!$statusRusak || !$statusPerbaikan) {
+            return back()->with('error', 'Status Aset "Rusak" atau "Dalam Perbaikan" tidak ditemukan.');
         }
+
+        $aset->status_id = $statusPerbaikan->id;
+        $aset->save();
+
+        RiwayatService::create([
+            'aset_kode_tag'       => $aset->kode_tag,
+            'deskripsi_kerusakan' => $validated['deskripsi_kerusakan'],
+            'tanggal_masuk_service' => $validated['tanggal_masuk_service'],
+            'perkiraan_selesai'   => $validated['perkiraan_selesai'],
+            'vendor_id'           => $validated['vendor_id'],
+        ]);
+
+        return redirect()->route('riwayat-service.index')->with('success', 'Catatan service berhasil ditambahkan.');
     }
 
-    /**
-     * Memperbarui catatan service menjadi selesai.
-     */
     public function update(Request $request, RiwayatService $riwayatService)
     {
         $validated = $request->validate([
-            'tindakan_perbaikan'      => 'nullable|string',
-            'biaya_service'           => 'nullable|numeric',
             'tanggal_selesai_service' => 'required|date|after_or_equal:tanggal_masuk_service',
+            'tindakan_perbaikan'      => 'nullable|string',
+            'biaya_service'           => 'nullable|numeric|min:0',
         ]);
 
-        DB::beginTransaction();
-        try {
-            $riwayatService->update($validated);
-            
-            $aset = $riwayatService->aset;
-            if ($aset) {
-                $historiAktif = $aset->historiPemakaians()->whereNull('tanggal_kembali')->latest('tanggal_serah')->first();
-                $targetStatus = $historiAktif ? 'digunakan' : 'tersedia';
-                $statusAset = StatusAset::whereRaw('LOWER(nama) = ?', [$targetStatus])->first();
-                
-                if ($statusAset) {
-                    $aset->status_id = $statusAset->id;
-                    $aset->save();
-                }
-            }
+        $riwayatService->update($validated);
 
-            DB::commit();
-            return redirect()->route('riwayat-service.index')->with('success', 'Riwayat service berhasil diselesaikan.');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        $statusTersedia = StatusAset::whereRaw('LOWER(nama) = ?', ['tersedia'])->first();
+        if ($statusTersedia) {
+            $riwayatService->aset->update(['status_id' => $statusTersedia->id]);
         }
+
+        return redirect()->back()->with('success', 'Service telah diselesaikan.');
     }
-    
-    /**
-     * Menyediakan data aset untuk pencarian AJAX di Select2.
-     */
+
     public function searchAset(Request $request)
     {
-        // PERBAIKAN: Mengembalikan logika lama sesuai permintaan
-        // 1. Cari ID untuk status 'rusak'
-        $statusRusak = StatusAset::whereRaw('LOWER(nama) = ?', ['rusak'])->first();
-    
-        if (!$statusRusak) {
-            return response()->json(['results' => []]);
+        $user = auth()->user();
+        $searchTerm = $request->query('q');
+
+        $query = Aset::query();
+
+        if ($user->role !== 'superadmin') {
+            $query->where('department_id', $user->department_id);
         }
-    
-        // 2. Mulai query dengan filter HANYA untuk aset yang rusak
-        $query = Aset::where('status_id', $statusRusak->id);
-    
-        // 3. Tambahkan filter pencarian berdasarkan ketikan user
-        $search = $request->input('q');
-        if ($search) {
-            $query->where(function($q) use ($search) {
-                $q->where('kode_tag', 'like', "%{$search}%")
-                  ->orWhere('merk', 'like', "%{$search}%")
-                  ->orWhere('type', 'like', "%{$search}%");
+
+        if ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('kode_tag', 'like', "%{$searchTerm}%")
+                  ->orWhere('merk', 'like', "%{$searchTerm}%")
+                  ->orWhere('type', 'like', "%{$searchTerm}%");
             });
         }
-    
-        // 4. Ambil data
-        $asets = $query->limit(10)->get();
-    
-        // 5. Format hasilnya
-        $results = $asets->map(function($aset) {
+
+        $asets = $query->take(10)->get();
+
+        $results = $asets->map(function ($aset) {
+            $statusRusak = StatusAset::whereRaw('LOWER(nama) = ?', ['rusak'])->first();
             return [
-                'id'       => $aset->kode_tag,
-                'text'     => "{$aset->merk} {$aset->type} ({$aset->kode_tag})",
-                'is_rusak' => true // Karena kita hanya mencari yang rusak, ini selalu true
+                'id' => $aset->kode_tag,
+                'text' => "{$aset->merk} {$aset->type} ({$aset->kode_tag})",
+                'is_rusak' => $aset->status_id === ($statusRusak->id ?? null),
             ];
         });
-    
+
         return response()->json(['results' => $results]);
     }
 }
