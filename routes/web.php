@@ -67,5 +67,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/pemakaian/{aset:kode_tag}/kembalikan', [HistoriPemakaianController::class, 'kembalikan'])->name('pemakaian.kembalikan');
     Route::post('/pemakaian/kembalikan-multiple', [HistoriPemakaianController::class, 'kembalikanMultiple'])->name('pemakaian.kembalikan.multiple');
     Route::post('/pemakaian/serah-terima-cetak', [HistoriPemakaianController::class, 'cetakManual'])->name('pemakaian.serah_terima.cetak');
+    Route::get('/public/aset/{kode_tag}', [AsetController::class, 'showPublic'])->name('aset.showPublic');
     
 }); // Penutup middleware group

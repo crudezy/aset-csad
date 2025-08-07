@@ -187,6 +187,14 @@ class AsetController extends Controller
         // Contoh sederhana: Mengarahkan ke view yang bisa Anda desain untuk cetak
         return view('aset.cetak-label', compact('asetsToPrint'));
     }
+    public function showPublic($kode_tag)
+    {
+        // Cari aset berdasarkan kode_tag, jika tidak ketemu akan error 404
+        $aset = \App\Models\Aset::where('kode_tag', $kode_tag)->firstOrFail();
+
+        // Arahkan ke view baru yang akan kita buat
+        return view('aset.detail-publik', compact('aset'));
+    }
 
     
 }

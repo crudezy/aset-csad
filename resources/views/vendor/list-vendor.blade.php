@@ -3,10 +3,8 @@
 @section('title', 'Data Vendor')
 
 @push('style')
-    <!-- CSS Libraries -->
     <link rel="stylesheet" href="{{ asset('library/selectric/public/selectric.css') }}">
     <link rel="stylesheet" href="{{ asset('library/izitoast/dist/css/iziToast.min.css') }}">
-    {{-- Menambahkan CSS untuk DataTables --}}
     <link rel="stylesheet" href="{{ asset('library/datatables/media/css/jquery.dataTables.min.css') }}">
 @endpush
 
@@ -32,7 +30,6 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            {{-- Menambahkan ID ke tabel untuk DataTables --}}
                             <table class="table table-striped" id="table-vendor">
                                 <thead>
                                     <tr>
@@ -45,7 +42,6 @@
                                 <tbody>
                                     @forelse ($vendors as $vendor)
                                         <tr>
-                                            {{-- Menggunakan $loop->iteration untuk penomoran yang benar dengan DataTables --}}
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $vendor->nama_vendor }}</td>
                                             <td>{{ $vendor->kontak ?? '-' }}</td>
@@ -78,20 +74,17 @@
     </div>
 @endsection
 
-{{-- PERBAIKAN: Kode modal sekarang di "push" ke stack bernama 'modals' --}}
 @push('modals')
+    {{-- Memanggil file modal terpisah --}}
     @include('vendor.partials.modals')
 @endpush
 
 @push('scripts')
-    <!-- JS Libraies -->
     <script src="{{ asset('library/selectric/public/jquery.selectric.min.js') }}"></script>
     <script src="{{ asset('library/izitoast/dist/js/iziToast.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    {{-- Menambahkan JS untuk DataTables --}}
     <script src="{{ asset('library/datatables/media/js/jquery.dataTables.min.js') }}"></script>
 
-    <!-- Page Specific JS File -->
     <script>
         $(document).ready(function() {
             // Inisialisasi DataTables
@@ -101,7 +94,7 @@
                 }
             });
 
-            // Script notifikasi
+            // Notifikasi untuk session 'success' (Hijau)
             @if (session('success'))
                 iziToast.success({
                     title: 'Berhasil!',
@@ -109,6 +102,9 @@
                     position: 'topRight'
                 });
             @endif
+
+            // =================================================================
+            // PENAMBAHAN DI SINI: Notifikasi untuk session 'error' (Merah)
             @if (session('error'))
                 iziToast.error({
                     title: 'Gagal!',
@@ -116,6 +112,7 @@
                     position: 'topRight'
                 });
             @endif
+            // =================================================================
 
             // Event delegation untuk tombol edit
             $('#table-vendor tbody').on('click', '.btn-edit', function() {
@@ -150,7 +147,7 @@
                 })
             });
 
-            // Script validasi
+            // Script untuk membuka kembali modal jika ada error validasi
             @if ($errors->any())
                 @if (old('_method') === 'PUT')
                     $('#modal-edit-vendor').modal('show');

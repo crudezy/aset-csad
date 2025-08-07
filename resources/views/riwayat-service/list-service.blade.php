@@ -45,7 +45,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($riwayatServices as $service)
+                                    @foreach ($riwayatServices as $service)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>
@@ -72,11 +72,7 @@
                                                 </button>
                                             </td>
                                         </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="7" class="text-center">Tidak ada aset yang sedang dalam service.</td>
-                                        </tr>
-                                    @endforelse
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -99,10 +95,12 @@
     
     <script>
         $(document).ready(function() {
+            // Inisialisasi DataTable
             $('#service-table').DataTable({
                 "language": { "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Indonesian.json" }
             });
 
+            // Logika untuk notifikasi (iziToast)
             @if (session('success'))
                 iziToast.success({ title: 'Berhasil!', message: '{{ session('success') }}', position: 'topRight' });
             @endif
@@ -110,34 +108,45 @@
                 iziToast.error({ title: 'Gagal!', message: '{{ session('error') }}', position: 'topRight' });
             @endif
 
+            // Menyiapkan tanggal hari ini untuk default value
             const today = new Date();
             const yyyy = today.getFullYear();
             const mm = String(today.getMonth() + 1).padStart(2, '0');
             const dd = String(today.getDate()).padStart(2, '0');
             const formattedToday = `${yyyy}-${mm}-${dd}`;
 
+            // Handler untuk tombol "Tambah Catatan Service"
+            // Tugasnya HANYA membuka modal.
             $('#btn-tambah-service').on('click', function(e) {
                 e.preventDefault();
-                $('#modal-tambah-service form')[0].reset();
-                $('#aset_kode_tag_tambah').val(null).trigger('change');
-                $('#vendor_id_tambah').val(null).trigger('change');
-                $('#hidden_aset_kode_tag_tambah').val('');
-                $('#tanggal_masuk_service_tambah').val(formattedToday);
                 $('#modal-tambah-service').modal('show');
             });
 
+            // Handler ini berjalan SETELAH modal "Tambah Service" benar-benar muncul
+            // Semua persiapan isi modal dilakukan di sini.
             $('#modal-tambah-service').on('shown.bs.modal', function () {
-                var select2El = $(this).find('#aset_kode_tag_tambah');
+                var modal = $(this);
+                var select2Asset = modal.find('#aset_kode_tag_tambah');
                 
-                // Inisialisasi semua select2 biasa dan yang memiliki fitur tagging
-                $(this).find('.select2').select2({ dropdownParent: $(this) });
-                $(this).find('.select2-tags').select2({
+                // 1. Reset semua isian form
+                modal.find('form')[0].reset();
+                modal.find('#hidden_aset_kode_tag_tambah').val('');
+                modal.find('#tanggal_masuk_service_tambah').val(formattedToday);
+                
+                // 2. Hancurkan instance Select2 yang mungkin ada untuk menghindari konflik
+                if (modal.find('.select2-hidden-accessible').length) {
+                    modal.find('.select2, .select2-tags').select2('destroy');
+                }
+
+                // 3. Inisialisasi Select2 untuk Vendor
+                modal.find('.select2-tags').select2({
                     tags: true,
-                    dropdownParent: $(this)
+                    dropdownParent: modal
                 });
                 
-                select2El.select2({
-                    dropdownParent: $(this), 
+                // 4. Inisialisasi Select2 untuk Aset dengan pencarian AJAX
+                select2Asset.select2({
+                    dropdownParent: modal, 
                     placeholder: 'Ketik untuk mencari aset...',
                     ajax: {
                         url: "{{ route('riwayat-service.searchAset') }}",
@@ -155,17 +164,24 @@
                     }
                 });
 
-                select2El.on('select2:select', function (e) {
+                // 5. Setelah diinisialisasi, baru setel nilainya ke kosong
+                select2Asset.val(null).trigger('change');
+                modal.find('#vendor_id_tambah').val(null).trigger('change');
+                
+                // 6. Siapkan event listener untuk saat aset dipilih
+                select2Asset.on('select2:select', function (e) {
                     var data = e.params.data;
-                    $('#hidden_aset_kode_tag_tambah').val(data.id);
+                    modal.find('#hidden_aset_kode_tag_tambah').val(data.id);
                 });
             });
 
+            // Handler untuk membersihkan modal SETELAH ditutup
             $('#modal-tambah-service').on('hidden.bs.modal', function () {
-                $('#aset_kode_tag_tambah').val(null).trigger('change');
-                $('#hidden_aset_kode_tag_tambah').val('');
+                // Hapus event listener 'select' agar tidak menumpuk dan menyebabkan panggilan ganda
+                $(this).find('#aset_kode_tag_tambah').off('select2:select');
             });
 
+            // Handler untuk tombol "Selesaikan Service" di setiap baris tabel
             $('#service-table tbody').on('click', '.btn-selesaikan', function() {
                 const service = $(this).data('service');
                 const aset = $(this).data('aset');
@@ -184,6 +200,7 @@
                 modal.modal('show');
             });
 
+            // Handler untuk membuka kembali modal jika ada error validasi dari server
             @if ($errors->any())
                 $('#modal-tambah-service').modal('show');
             @endif

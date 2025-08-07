@@ -8,19 +8,21 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="{{ route('vendor.store') }}" method="POST" class="needs-validation" novalidate="">
+            <form action="{{ route('vendor.store') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Nama Vendor</label>
-                        <input type="text" name="nama_vendor" class="form-control" required="">
+                        <input type="text" name="nama_vendor" class="form-control @error('nama_vendor') is-invalid @enderror" value="{{ old('nama_vendor') }}" required>
+                        @error('nama_vendor')
                         <div class="invalid-feedback">
-                            Nama vendor tidak boleh kosong.
+                            {{ $message }}
                         </div>
+                        @enderror
                     </div>
                     <div class="form-group">
                         <label>Kontak (Opsional)</label>
-                        <input type="text" name="kontak" class="form-control">
+                        <input type="text" name="kontak" class="form-control" value="{{ old('kontak') }}">
                     </div>
                 </div>
                 <div class="modal-footer bg-whitesmoke br">
@@ -42,21 +44,25 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form id="form-edit-vendor" method="POST" class="needs-validation" novalidate="">
+            <form id="form-edit-vendor" method="POST">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
-                     <div class="form-group">
+                      <div class="form-group">
                         <label>Nama Vendor</label>
-                        <input type="text" name="nama_vendor" id="edit-nama_vendor" class="form-control" required="">
+                        <input type="text" name="nama_vendor" id="edit-nama_vendor" class="form-control @error('nama_vendor') is-invalid @enderror" required>
+                        @error('nama_vendor')
                         <div class="invalid-feedback">
-                           Nama vendor tidak boleh kosong.
+                            {{ $message }}
                         </div>
+                        @enderror
                     </div>
                     <div class="form-group">
                         <label>Kontak (Opsional)</label>
                         <input type="text" name="kontak" id="edit-kontak" class="form-control">
                     </div>
+                    {{-- Hidden input untuk membantu deteksi modal mana yang harus dibuka saat validasi gagal --}}
+                    <input type="hidden" name="_method" value="PUT">
                 </div>
                 <div class="modal-footer bg-whitesmoke br">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>

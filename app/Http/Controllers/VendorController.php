@@ -16,7 +16,8 @@ class VendorController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama_vendor' => 'required|string|max:255',
+            // Tambahkan aturan 'unique' di sini
+            'nama_vendor' => 'required|string|max:255|unique:vendors,nama_vendor',
             'kontak' => 'nullable|string|max:255',
         ]);
         Vendor::create($validated);
@@ -26,7 +27,7 @@ class VendorController extends Controller
     public function update(Request $request, Vendor $vendor)
     {
         $validated = $request->validate([
-            'nama_vendor' => 'required|string|max:255',
+            'nama_vendor' => 'required|string|max:255|unique:vendors,nama_vendor,' . $vendor->id,
             'kontak' => 'nullable|string|max:255',
         ]);
         $vendor->update($validated);
