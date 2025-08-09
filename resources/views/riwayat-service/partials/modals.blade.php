@@ -10,8 +10,8 @@
             </div>
             <form action="{{ route('riwayat-service.store') }}" method="POST">
                 @csrf
-                <input type="hidden" name="aset_kode_tag" id="hidden_aset_kode_tag_tambah">
-
+                <input type="hidden" name="hidden_aset_kode_tag" id="hidden_aset_kode_tag_tambah">
+                
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="aset_kode_tag_tambah">Pilih Aset <span class="text-danger">*</span></label>

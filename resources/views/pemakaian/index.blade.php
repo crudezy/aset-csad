@@ -59,10 +59,11 @@
                                                 <td>{{ $history->pegawai->nama }}</td>
                                                 <td>{{ \Carbon\Carbon::parse($history->tanggal_serah)->format('d M Y') }}</td>
                                                 <td>
-                                                    <form action="{{ route('pemakaian.kembalikan', $history->aset_kode_tag) }}" method="POST" class="d-inline">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-info btn-sm">Kembalikan</button>
-                                                    </form>
+                                                <!-- <button type="button" class="btn btn-info btn-sm btn-kembalikan-single" 
+                                                        data-url="{{ route('pemakaian.kembalikan', $history->id) }}"
+                                                        data-aset-nama="{{ $history->aset->merk }} {{ $history->aset->type }}">
+                                                    Kembalikan
+                                                </button> -->
                                                     <button type="button" class="btn btn-warning btn-sm btn-cetak" 
                                                             data-toggle="modal" 
                                                             data-target="#modal-cetak-serah-terima"

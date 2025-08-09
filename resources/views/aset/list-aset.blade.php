@@ -33,13 +33,13 @@
                             <button class="btn btn-primary" data-toggle="modal" data-target="#modal-tambah-aset">
                                 <i class="fas fa-plus"></i> Tambah Baru
                             </button>
-                            <form action="{{ route('aset.destroyAll') }}" method="POST" class="d-inline ml-2">
+                            <!-- <form action="{{ route('aset.destroyAll') }}" method="POST" class="d-inline ml-2">
                                 @csrf
                                 @method('DELETE')
                                 <button class="btn btn-danger confirm-delete-all">
                                     <i class="fas fa-trash-alt"></i> Hapus Semua
                                 </button>
-                            </form>
+                            </form> -->
                         </div>
                     </div>
                     <div class="card-body">
@@ -89,12 +89,12 @@
                                                     <a href="{{ route('aset.show', $aset->kode_tag) }}" class="btn btn-secondary btn-sm">Detail</a>
                                                     <button type="button" class="btn btn-warning btn-sm btn-edit" data-aset='@json($aset)'>Edit</button>
                                                     
-                                                    @if (strtolower($aset->statusAset->nama) != 'digunakan')
+                                                    <!-- @if (strtolower($aset->statusAset->nama) != 'digunakan')
                                                         <form action="{{ route('aset.destroy', $aset->kode_tag) }}" method="POST" class="d-inline">
                                                             @csrf
                                                             <button class="btn btn-danger btn-sm confirm-delete">Hapus</button>
                                                         </form>
-                                                    @endif
+                                                    @endif -->
                                                 </td>
                                             </tr>
                                         @endforeach

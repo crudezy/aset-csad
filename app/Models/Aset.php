@@ -13,7 +13,6 @@ class Aset extends Model
     protected $primaryKey = 'kode_tag';
     public $incrementing = false;
     protected $keyType = 'string';
-
     protected $guarded = []; // Izinkan mass assignment untuk semua field
 
     // Relasi ke Kategori
@@ -22,12 +21,6 @@ class Aset extends Model
         return $this->belongsTo(Kategori::class);
     }
     
-
-    // Relasi ke Status Aset
-    public function status()
-    {
-        return $this->belongsTo(StatusAset::class, 'status_id');
-    }
 
     // Relasi ke Vendor
     public function vendor()
@@ -49,8 +42,6 @@ class Aset extends Model
     
     public function statusAset()
     {
-        // Nama model yang berhubungan adalah StatusAset
-        // Foreign key di tabel 'asets' adalah 'status_id'
         return $this->belongsTo(StatusAset::class, 'status_id');
     }
     public function pemegangTerakhir()
