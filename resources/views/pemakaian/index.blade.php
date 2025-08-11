@@ -25,7 +25,7 @@
                         <h4>Daftar Pemakaian Aset</h4>
                         <div class="card-header-action">
                             <button class="btn btn-primary mr-2" id="btn-kembalikan-terpilih" style="display: none;">
-                                <i class="fas fa-undo"></i> Kembalikan yang Terpilih
+                                <i class="fas fa-undo"></i> Kembalikan
                             </button>
                             <button class="btn btn-success" data-toggle="modal" data-target="#modal-serah-terima-aset">
                                 <i class="fas fa-exchange-alt"></i> Lakukan Serah Terima

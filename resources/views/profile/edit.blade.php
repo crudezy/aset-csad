@@ -3,7 +3,6 @@
 @section('title', 'Edit Profile')
 
 @push('style')
-    {{-- CSS Libraries tambahan jika diperlukan --}}
 @endpush
 
 @section('content')
