@@ -18,12 +18,9 @@ return new class extends Migration
             $table->string('nama');
             $table->string('email')->unique()->nullable(); // Diubah menjadi bisa null
             $table->string('no_telp')->nullable(); // Kolom baru, bisa null
-            
-            // Foreign Key ke tabel departemen (onDelete('restrict') dihapus)
-            $table->foreignId('departemen_id')->constrained('departemens')->onUpdate('cascade');
-            
-            // Foreign Key ke tabel lokasi (onDelete('restrict') dihapus)
-            $table->foreignId('lokasi_id')->constrained('lokasis')->onUpdate('cascade');
+
+            $table->foreignId('department_id')->constrained('departemens');
+            $table->foreignId('lokasi_id')->constrained('lokasis')->onUpdate('cascade')->onDelete('cascade');
             
             $table->timestamps();
         });

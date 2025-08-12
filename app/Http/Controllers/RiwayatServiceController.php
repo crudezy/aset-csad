@@ -7,6 +7,8 @@ use App\Models\StatusAset;
 use App\Models\RiwayatService;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Exception;
 
 class RiwayatServiceController extends Controller
 {
@@ -29,21 +31,30 @@ class RiwayatServiceController extends Controller
         // 3. AMBIL HASILNYA
         $riwayatServices = $riwayatServicesQuery->get();
 
-        $vendors = Vendor::orderBy('nama_vendor')->get();
+        // PERBAIKAN: Mengembalikan nama kolom yang benar di tabel vendors
+        $vendors = Vendor::orderBy('nama_vendor')->get(); 
 
         return view('riwayat-service.list-service', compact('riwayatServices', 'vendors'));
     }
-    // ... (Sisa method seperti store, update, dll. TETAP SAMA) ...
     
     public function store(Request $request)
     {
+        // PENTING: Ubah validasi vendor_id agar bisa menerima string (untuk nama vendor baru)
         $validated = $request->validate([
-            'hidden_aset_kode_tag' => 'required|exists:asets,kode_tag',
-            'deskripsi_kerusakan'  => 'required|string',
-            'tanggal_masuk_service'=> 'required|date',
-            'perkiraan_selesai'    => 'nullable|date|after_or_equal:tanggal_masuk_service',
-            'vendor_id'            => 'nullable|exists:vendors,id',
+            'hidden_aset_kode_tag'  => 'required|exists:asets,kode_tag',
+            'deskripsi_kerusakan'   => 'required|string',
+            'tanggal_masuk_service' => 'required|date',
+            'perkiraan_selesai'     => 'nullable|date|after_or_equal:tanggal_masuk_service',
+            'vendor_id'             => 'required', // Hapus exists:vendors,id
         ]);
+
+        // LOGIKA BARU: Tangani input vendor_id yang bisa berupa ID atau nama baru
+        $vendorId = $request->input('vendor_id');
+        if (!is_numeric($vendorId)) {
+            // Jika input bukan angka, buat vendor baru
+            $vendor = Vendor::firstOrCreate(['nama_vendor' => $vendorId]); // PERBAIKAN: Gunakan 'nama_vendor'
+            $validated['vendor_id'] = $vendor->id;
+        }
 
         $aset = Aset::findOrFail($validated['hidden_aset_kode_tag']);
         $statusRusak = StatusAset::whereRaw('LOWER(nama) = ?', ['rusak'])->first();
@@ -77,19 +88,16 @@ class RiwayatServiceController extends Controller
 
         $riwayatService->update($validated);
 
-        // Cari riwayat pemakaian terakhir yang belum dikembalikan untuk aset ini
         $historiAktif = $riwayatService->aset->historiPemakaians()
-                                            ->whereNull('tanggal_kembali')
-                                            ->first();
+                                             ->whereNull('tanggal_kembali')
+                                             ->first();
 
-        // Jika ditemukan histori pemakaian aktif, ubah status aset menjadi "Digunakan"
         if ($historiAktif) {
             $statusDigunakan = StatusAset::whereRaw('LOWER(nama) = ?', ['digunakan'])->first();
             if ($statusDigunakan) {
                 $riwayatService->aset->update(['status_id' => $statusDigunakan->id]);
             }
         } else {
-            // Jika tidak ada histori pemakaian aktif, ubah status menjadi "Tersedia"
             $statusTersedia = StatusAset::whereRaw('LOWER(nama) = ?', ['tersedia'])->first();
             if ($statusTersedia) {
                 $riwayatService->aset->update(['status_id' => $statusTersedia->id]);
@@ -104,25 +112,18 @@ class RiwayatServiceController extends Controller
         $user = auth()->user();
         $searchTerm = $request->query('q');
 
-        // 1. Cari ID untuk status "Rusak"
         $statusRusak = StatusAset::whereRaw('LOWER(nama) = ?', ['rusak'])->first();
         if (!$statusRusak) {
-            // Jika status 'Rusak' tidak ada, kembalikan hasil kosong
             return response()->json(['results' => []]);
         }
 
-        // 2. Mulai query
         $query = Aset::query();
-
-        // 3. Tambahkan filter WAJIB: hanya aset berstatus "Rusak"
         $query->where('status_id', $statusRusak->id);
 
-        // 4. Terapkan filter departemen jika bukan superadmin
         if ($user->role !== 'superadmin') {
             $query->where('department_id', $user->department_id);
         }
 
-        // 5. Terapkan filter berdasarkan input pencarian
         if ($searchTerm) {
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('kode_tag', 'like', "%{$searchTerm}%")
@@ -137,7 +138,6 @@ class RiwayatServiceController extends Controller
             return [
                 'id' => $aset->kode_tag,
                 'text' => "{$aset->merk} {$aset->type} ({$aset->kode_tag})",
-                // 'is_rusak' sekarang selalu true, tapi bisa kita biarkan
                 'is_rusak' => $aset->status_id === $statusRusak->id,
             ];
         });

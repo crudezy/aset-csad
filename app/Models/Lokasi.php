@@ -9,5 +9,13 @@ class Lokasi extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
-    public function pegawais() { return $this->hasMany(Pegawai::class); }
+    public function pegawais() 
+    { 
+        return $this->hasMany(Pegawai::class); 
+    }
+    
+    public function asets()
+    {
+        return $this->hasMany(Aset::class, 'lokasi_id');
+    }
 }

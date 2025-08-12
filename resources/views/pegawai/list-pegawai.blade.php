@@ -59,11 +59,11 @@
                                                         data-pegawai='@json($pegawai)'>
                                                     Edit
                                                 </button>
-                                                <form action="{{ route('pegawai.destroy', $pegawai->id) }}" method="POST" class="d-inline">
+                                                <!-- <form action="{{ route('pegawai.destroy', $pegawai->id) }}" method="POST" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button class="btn btn-danger btn-sm confirm-delete">Hapus</button>
-                                                </form>
+                                                </form> -->
                                             </td>
                                         </tr>
                                     @endforeach
@@ -117,7 +117,7 @@
                 form.find('#edit-nama').val(pegawai.nama);
                 form.find('#edit-email').val(pegawai.email);
                 form.find('#edit-no_telp').val(pegawai.no_telp);
-                form.find('#edit-departemen_id').val(pegawai.departemen_id).trigger('change');
+                form.find('#edit-department_id').val(pegawai.department_id).trigger('change');
                 form.find('#edit-lokasi_id').val(pegawai.lokasi_id).trigger('change');
                 $('#modal-edit-pegawai').modal('show');
             });

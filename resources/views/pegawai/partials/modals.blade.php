@@ -26,7 +26,7 @@
                     <div class="form-group">
                         <label>Departemen</label>
                         {{-- Ganti kelas menjadi select2-tags --}}
-                        <select name="departemen_id" class="form-control select2-tags" required="">
+                        <select name="department_id" class="form-control select2-tags" required="">
                             <option value="">Pilih atau ketik baru</option>
                             @foreach ($departemens as $departemen)
                                 <option value="{{ $departemen->id }}">{{ $departemen->nama }}</option>
@@ -85,7 +85,7 @@
                     <div class="form-group">
                         <label>Departemen</label>
                          {{-- Ganti kelas menjadi select2-tags --}}
-                        <select name="departemen_id" id="edit-departemen_id" class="form-control select2-tags" required="">
+                        <select name="department_id" id="edit-department_id" class="form-control select2-tags" required="">
                             <option value="">Pilih atau ketik baru</option>
                             @foreach ($departemens as $departemen)
                                 <option value="{{ $departemen->id }}">{{ $departemen->nama }}</option>

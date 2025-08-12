@@ -7,6 +7,7 @@ use App\Models\Lokasi;
 use App\Models\Departemen;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Exception;
 
 class PegawaiController extends Controller
 {
@@ -22,75 +23,92 @@ class PegawaiController extends Controller
         return view('pegawai.list-pegawai', compact('pegawais', 'lokasis', 'departemens'));
     }
 
-
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'nama' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255|unique:pegawais,email',
-            'no_telp' => 'nullable|string|max:20',
-            'departemen_id' => 'required', // Hapus validasi exists
-            'lokasi_id' => 'required',     // Hapus validasi exists
-        ]);
+        try {
+            $validated = $request->validate([
+                'nama' => 'required|string|max:255',
+                'email' => 'nullable|email|max:255|unique:pegawais,email',
+                'no_telp' => 'nullable|string|max:20',
+                'department_id' => 'required',
+                'lokasi_id' => 'required',
+            ]);
 
-        // Logika untuk membuat departemen baru jika diketik
-        $departemenId = $request->input('departemen_id');
-        if (!is_numeric($departemenId)) {
-            $departemen = Departemen::firstOrCreate(['nama' => $departemenId]);
-            $validated['departemen_id'] = $departemen->id;
+            $departmentId = $request->input('department_id');
+            if (!is_numeric($departmentId)) {
+                $departemen = Departemen::firstOrCreate(['nama' => $departmentId]);
+                $validated['department_id'] = $departemen->id;
+            }
+
+            $lokasiId = $request->input('lokasi_id');
+            if (!is_numeric($lokasiId)) {
+                $lokasi = Lokasi::firstOrCreate(['nama' => $lokasiId]);
+                $validated['lokasi_id'] = $lokasi->id;
+            }
+
+            Pegawai::create($validated);
+
+            return redirect()->route('pegawai.index')->with('success', 'Pegawai berhasil ditambahkan.');
+
+        } catch (Exception $e) {
+            \Log::error($e->getMessage());
+            return back()->with('error', 'Gagal menambahkan pegawai. Pastikan data yang dimasukkan valid.');
         }
-
-        // Logika untuk membuat lokasi baru jika diketik
-        $lokasiId = $request->input('lokasi_id');
-        if (!is_numeric($lokasiId)) {
-            $lokasi = Lokasi::firstOrCreate(['nama' => $lokasiId]);
-            $validated['lokasi_id'] = $lokasi->id;
-        }
-
-        Pegawai::create($validated);
-
-        return redirect()->route('pegawai.index')->with('success', 'Pegawai berhasil ditambahkan.');
     }
 
     public function update(Request $request, Pegawai $pegawai)
     {
-        $validated = $request->validate([
-            'nama' => 'required|string|max:255',
-            'email' => ['nullable', 'email', 'max:255', Rule::unique('pegawais')->ignore($pegawai->id)],
-            'no_telp' => 'nullable|string|max:20',
-            'departemen_id' => 'required',
-            'lokasi_id' => 'required',
-        ]);
+        try {
+            $validated = $request->validate([
+                'nama' => 'required|string|max:255',
+                'email' => ['nullable', 'email', 'max:255', Rule::unique('pegawais')->ignore($pegawai->id)],
+                'no_telp' => 'nullable|string|max:20',
+                'department_id' => 'required',
+                'lokasi_id' => 'required',
+            ]);
 
-        // Logika untuk membuat departemen baru jika diketik
-        $departemenId = $request->input('departemen_id');
-        if (!is_numeric($departemenId)) {
-            $departemen = Departemen::firstOrCreate(['nama' => $departemenId]);
-            $validated['departemen_id'] = $departemen->id;
+            $departmentId = $request->input('department_id');
+            if (!is_numeric($departmentId)) {
+                $departemen = Departemen::firstOrCreate(['nama' => $departmentId]);
+                $validated['department_id'] = $departemen->id;
+            }
+
+            $lokasiId = $request->input('lokasi_id');
+            if (!is_numeric($lokasiId)) {
+                $lokasi = Lokasi::firstOrCreate(['nama' => $lokasiId]);
+                $validated['lokasi_id'] = $lokasi->id;
+            }
+
+            $pegawai->update($validated);
+
+            return redirect()->route('pegawai.index')->with('success', 'Pegawai berhasil diperbarui.');
+
+        } catch (Exception $e) {
+            \Log::error($e->getMessage());
+            return back()->with('error', 'Gagal memperbarui pegawai. Pastikan data yang dimasukkan valid.');
         }
-
-        // Logika untuk membuat lokasi baru jika diketik
-        $lokasiId = $request->input('lokasi_id');
-        if (!is_numeric($lokasiId)) {
-            $lokasi = Lokasi::firstOrCreate(['nama' => $lokasiId]);
-            $validated['lokasi_id'] = $lokasi->id;
-        }
-
-        $pegawai->update($validated);
-
-        return redirect()->route('pegawai.index')->with('success', 'Pegawai berhasil diperbarui.');
     }
 
     public function destroy(Pegawai $pegawai)
     {
-        if ($pegawai->asets()->count() > 0) {
-            return back()->with('error', 'Pegawai tidak dapat dihapus karena masih menjadi penanggung jawab aset.');
-        }
-        if ($pegawai->historiPemakaians()->count() > 0) {
-            return back()->with('error', 'Pegawai tidak dapat dihapus karena memiliki riwayat pemakaian aset.');
-        }
+        try {
+            // Tambahkan logging untuk melihat data terkait sebelum penghapusan
+            \Log::info("Mencoba menghapus pegawai dengan ID: " . $pegawai->id);
+            \Log::info("Jumlah aset terkait: " . $pegawai->asets()->count());
+            \Log::info("Jumlah histori pemakaian terkait: " . $pegawai->historiPemakaians()->count());
 
-        $pegawai->delete();
-        return redirect()->route('pegawai.index')->with('success', 'Pegawai berhasil dihapus.');
+            if ($pegawai->asets()->count() > 0) {
+                return back()->with('error', 'Pegawai tidak dapat dihapus karena masih menjadi penanggung jawab aset.');
+            }
+            if ($pegawai->historiPemakaians()->count() > 0) {
+                return back()->with('error', 'Pegawai tidak dapat dihapus karena memiliki riwayat pemakaian aset.');
+            }
+
+            $pegawai->delete();
+            return redirect()->route('pegawai.index')->with('success', 'Pegawai berhasil dihapus.');
+        } catch (Exception $e) {
+            \Log::error($e->getMessage());
+            return back()->with('error', 'Gagal menghapus pegawai. Pastikan tidak ada data terkait lainnya.');
+        }
     }
 }

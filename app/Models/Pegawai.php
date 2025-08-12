@@ -16,7 +16,7 @@ class Pegawai extends Model
      */
     public function departemen()
     {
-        return $this->belongsTo(Departemen::class);
+        return $this->belongsTo(Departemen::class, 'department_id');
     }
 
     /**

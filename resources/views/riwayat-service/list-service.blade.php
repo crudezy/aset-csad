@@ -53,6 +53,7 @@
                                                 <small><code>{{ $service->aset_kode_tag }}</code></small>
                                             </td>
                                             <td>{{ $service->deskripsi_kerusakan }}</td>
+                                            {{-- Baris di bawah ini akan menampilkan nama vendor jika ada, atau '-' jika tidak ada --}}
                                             <td>{{ $service->vendor->nama_vendor ?? '-' }}</td>
                                             <td>{{ \Carbon\Carbon::parse($service->tanggal_masuk_service)->format('d F Y') }}</td>
                                             <td>

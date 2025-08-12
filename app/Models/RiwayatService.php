@@ -22,6 +22,7 @@ class RiwayatService extends Model
         'tanggal_selesai_service',
         'tindakan_perbaikan',
         'biaya_service',
+        'vendor_id',               // Relasi ke vendor
     ];
 
     /**
@@ -35,6 +36,6 @@ class RiwayatService extends Model
     }
     public function vendor()
     {
-        return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(Vendor::class, 'vendor_id');
     }
 }

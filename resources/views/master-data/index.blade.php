@@ -49,11 +49,11 @@
                                                         data-nama="{{ $lokasi->nama }}">
                                                     Edit
                                                 </button>
-                                                <form action="{{ route('lokasi.destroy', $lokasi->id) }}" method="POST" class="d-inline">
+                                                <!-- <form action="{{ route('lokasi.destroy', $lokasi->id) }}" method="POST" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button class="btn btn-danger btn-sm confirm-delete">Hapus</button>
-                                                </form>
+                                                </form> -->
                                             </td>
                                         </tr>
                                     @empty
@@ -98,11 +98,11 @@
                                                         data-nama="{{ $departemen->nama }}">
                                                     Edit
                                                 </button>
-                                                <form action="{{ route('departemen.destroy', $departemen->id) }}" method="POST" class="d-inline">
+                                                <!-- <form action="{{ route('departemen.destroy', $departemen->id) }}" method="POST" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button class="btn btn-danger btn-sm confirm-delete">Hapus</button>
-                                                </form>
+                                                </form> -->
                                             </td>
                                         </tr>
                                     @empty

@@ -18,10 +18,7 @@ class LokasiSeeder extends Seeder
      */
     public function run()
     {
-        Lokasi::create(['nama' => 'Gudang IT']);
-        Lokasi::create(['nama' => 'Lantai 1']);
-        Lokasi::create(['nama' => 'Lantai 2']);
-        Lokasi::create(['nama' => 'Lantai 3']);
-        Lokasi::create(['nama' => 'Ruang Meeting']);
+        Lokasi::create(['nama' => 'Head Office']);
+        Lokasi::create(['nama' => 'Sumatera']);
     }
 }

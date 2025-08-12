@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->unsignedBigInteger('department_id')->nullable();
-            $table->foreign('department_id')->references('id')->on('departemens')->onDelete('set null');
+            $table->foreign('department_id')->references('id')->on('departemens');
             $table->rememberToken();
             $table->timestamps();
         });

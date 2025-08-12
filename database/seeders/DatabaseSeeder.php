@@ -26,9 +26,8 @@ class DatabaseSeeder extends Seeder
             LokasiSeeder::class,
             DepartemenSeeder::class,
             StatusAsetSeeder::class,
-            VendorSeeder::class,
-            UserSeeder::class, 
-            AsetSeeder::class,
+            // VendorSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }

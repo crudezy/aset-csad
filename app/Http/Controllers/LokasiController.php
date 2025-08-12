@@ -41,13 +41,15 @@ class LokasiController extends Controller
      */
     public function destroy(Lokasi $lokasi)
     {
-        if ($lokasi->asets()->exists()) {
-            return back()->with('error', 'Lokasi tidak dapat dihapus karena masih terikat dengan data aset.');
+        // PERBAIKAN: Periksa apakah ada pegawai yang masih terhubung dengan lokasi ini
+        // Menggunakan relasi 'pegawais()' yang sudah Anda definisikan.
+        if ($lokasi->pegawais()->count() > 0) {
+            // Tampilkan pesan error ke pengguna
+            return redirect()->route('master-data.index')->with('error', 'Tidak bisa menghapus lokasi karena masih ada pegawai yang terhubung.');
         }
-        
+
+        // Jika tidak ada pegawai yang terhubung, hapus lokasinya
         $lokasi->delete();
-        
-        // PASTIKAN REDIRECT MENGARAH KE 'master-data.index'
         return redirect()->route('master-data.index')->with('success', 'Lokasi berhasil dihapus.');
     }
 }
