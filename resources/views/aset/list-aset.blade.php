@@ -88,7 +88,14 @@
                                                 <td>
                                                     <a href="{{ route('aset.show', $aset->kode_tag) }}" class="btn btn-secondary btn-sm">Detail</a>
                                                     <button type="button" class="btn btn-warning btn-sm btn-edit" data-aset='@json($aset)'>Edit</button>
-                                                    
+                                                    @php
+                                                        $statusAset = strtolower($aset->statusAset->nama);
+                                                    @endphp
+                                                    @if ($statusAset != 'rusak' && $statusAset != 'dalam perbaikan')
+                                                        <button type="button" class="btn btn-danger btn-sm btn-tandai-rusak" data-kode-tag="{{ $aset->kode_tag }}">
+                                                            </i> Rusak
+                                                        </button>
+                                                    @endif
                                                     <!-- @if (strtolower($aset->statusAset->nama) != 'digunakan')
                                                         <form action="{{ route('aset.destroy', $aset->kode_tag) }}" method="POST" class="d-inline">
                                                             @csrf
@@ -152,7 +159,7 @@
                 form.find('#edit-serial_number').val(aset.serial_number);
                 form.find('#edit-tanggal_pembelian').val(aset.tanggal_pembelian);
                 form.find('#edit-kategori_id').val(aset.kategori_id).trigger('change');
-                form.find('#edit-status_id').val(aset.status_id).trigger('change');
+                // form.find('#edit-status_id').val(aset.status_id).trigger('change');
                 form.find('#edit-vendor_id').val(aset.vendor_id).trigger('change');
                 form.find('#edit-spesifikasi').val(aset.spesifikasi);
                 form.find('#edit-keterangan').val(aset.keterangan);
@@ -202,12 +209,14 @@
             @endif
 
             // --- Logika Checkbox dan Tombol Cetak Label Terpilih ---
-            function toggleCetakLabelButton() {
+            function toggleActionButtons() {
                 var checkedCount = $('.checkbox-item-aset:checked').length;
                 if (checkedCount > 0) {
                     $('#btn-cetak-terpilih').fadeIn('fast');
+                    $('#btn-tandai-rusak').fadeIn('fast'); // Tampilkan tombol Tandai Rusak
                 } else {
                     $('#btn-cetak-terpilih').fadeOut('fast');
+                    $('#btn-tandai-rusak').fadeOut('fast'); // Sembunyikan tombol Tandai Rusak
                 }
             }
 
@@ -219,7 +228,7 @@
 
             // Checkbox Individual
             $('#table-aset tbody').on('change', '.checkbox-item-aset', function() {
-                toggleCetakLabelButton();
+                toggleActionButtons();
                 // Jika ada item yang tidak terpilih, uncheck 'pilih semua'
                 if (!$(this).is(':checked')) {
                     $('#checkbox-all-aset').prop('checked', false);
@@ -254,13 +263,92 @@
                 });
                 $('.checkbox-item-aset').prop('checked', false);
                 $('#checkbox-all-aset').prop('checked', false);
-                toggleCetakLabelButton(); // Sembunyikan tombol setelah aksi
+                toggleActionButtons(); // Sembunyikan tombol setelah aksi
             });
+            $('#btn-tandai-rusak').on('click', function(e) {
+                e.preventDefault();
+                var selectedAset = [];
+                $('.checkbox-item-aset:checked').each(function() {
+                    selectedAset.push($(this).val());
+                });
 
+                if (selectedAset.length === 0) {
+                    Swal.fire('Perhatian!', 'Pilih setidaknya satu aset untuk ditandai rusak.', 'warning');
+                    return;
+                }
 
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Status aset yang dipilih akan diubah menjadi 'Rusak'!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, Tandai Rusak!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '{{ route("aset.update.status") }}', // Anda perlu membuat rute ini
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                kode_tags: selectedAset,
+                                status: 'rusak' // atau ID status 'rusak'
+                            },
+                            success: function(response) {
+                                iziToast.success({ title: 'Berhasil!', message: response.message, position: 'topRight' });
+                                // Opsional: Reload halaman atau tabel data
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 1500);
+                            },
+                            error: function(xhr) {
+                                iziToast.error({ title: 'Gagal!', message: 'Terjadi kesalahan saat memperbarui status.', position: 'topRight' });
+                            }
+                        });
+                    }
+                });
+            });
+            $('#table-aset').on('click', '.btn-tandai-rusak', function(e) {
+                e.preventDefault();
+                var kodeTag = $(this).data('kode-tag');
 
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Status aset ini akan diubah menjadi 'Rusak'!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, Tandai Rusak!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '{{ route("aset.update.status") }}',
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                kode_tags: [kodeTag], // Kirim dalam bentuk array
+                                status: 'rusak'
+                            },
+                            success: function(response) {
+                                iziToast.success({ title: 'Berhasil!', message: response.message, position: 'topRight' });
+                                // Opsional: Muat ulang halaman setelah berhasil
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 1500);
+                            },
+                            error: function(xhr) {
+                                iziToast.error({ title: 'Gagal!', message: 'Terjadi kesalahan saat memperbarui status.', position: 'topRight' });
+                            }
+                        });
+                    }
+                });
+            });
             // Inisialisasi awal tombol
-            toggleCetakLabelButton();
+            toggleActionButtons();
         });
     </script>
 @endpush

@@ -195,6 +195,22 @@ class AsetController extends Controller
         // Arahkan ke view baru yang akan kita buat
         return view('aset.detail-publik', compact('aset'));
     }
+    public function updateStatus(Request $request)
+    {
+        $request->validate([
+            'kode_tags' => 'required|array',
+            'kode_tags.*' => 'string|exists:asets,kode_tag',
+            'status' => 'required|string'
+        ]);
 
-    
+        $statusRusak = StatusAset::where('nama', 'rusak')->first();
+
+        if (!$statusRusak) {
+            return response()->json(['message' => 'Status "Rusak" tidak ditemukan.'], 404);
+        }
+
+        Aset::whereIn('kode_tag', $request->kode_tags)->update(['status_id' => $statusRusak->id]);
+
+        return response()->json(['message' => 'Status aset berhasil diperbarui menjadi Rusak.']);
+    }
 }

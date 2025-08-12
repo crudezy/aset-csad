@@ -125,18 +125,6 @@
                             <small class="form-text text-muted">Kategori tidak dapat diubah.</small>
                         </div>
                         <div class="form-group col-md-6">
-                            <label>Status Aset</label>
-                            <select name="status_id" id="edit-status_id" class="form-control select2">
-                                @foreach ($statusAsets as $status)
-                                    @if(strtolower($status->nama) != 'digunakan')
-                                        <option value="{{ $status->id }}">{{ $status->nama }}</option>
-                                    @endif
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-12">
                             <label>Vendor</label>
                             <select name="vendor_id" id="edit-vendor_id" class="form-control select2">
                                 <option value="">Pilih Vendor (Opsional)</option>

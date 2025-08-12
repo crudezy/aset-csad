@@ -3,12 +3,10 @@
 @section('title', 'Login')
 
 @push('style')
-    {{-- CSS Libraries --}}
     <link rel="stylesheet"
         href="{{ asset('library/bootstrap-social/bootstrap-social.css') }}">
 @endpush
 
-{{-- Menggunakan @section('content') agar cocok dengan layouts/app.blade.php --}}
 @section('content')
     <section class="section">
         <div class="container mt-5">
@@ -43,12 +41,19 @@
                                             @endif
                                         </div>
                                     </div>
+                                    <div class="input-group">
                                     <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" tabindex="2" required>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                            <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
                                     @error('password')
                                     <div class="invalid-feedback">
                                         {{ $message }}
                                     </div>
                                     @enderror
+                                </div>
                                 </div>
 
                                 <div class="form-group">
@@ -73,5 +78,19 @@
 @endsection
 
 @push('scripts')
-    {{-- JS Libraries --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function (e) {
+            // toggle the type attribute
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            // toggle the eye icon
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+    });
+</script>
 @endpush
