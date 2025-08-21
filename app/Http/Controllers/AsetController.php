@@ -95,10 +95,9 @@ class AsetController extends Controller
             'type' => 'nullable|string|max:255',
             'spesifikasi' => 'nullable|string',
             'tanggal_pembelian' => 'nullable|date',
-            'harga_beli' => 'nullable|numeric|min:0',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'keterangan' => 'nullable|string',
-            'status_id' => 'required|exists:status_asets,id',
+            'kategori_id' => 'required|exists:kategoris,id',
             'vendor_id' => 'nullable|exists:vendors,id',
         ]);
         

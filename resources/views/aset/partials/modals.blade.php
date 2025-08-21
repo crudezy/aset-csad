@@ -121,7 +121,12 @@
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label>Kategori</label>
-                            <input type="text" id="edit-kategori" class="form-control" readonly>
+                            {{-- Input ini hanya untuk menampilkan nama kategori ke pengguna --}}
+                            <input type="text" id="edit-kategori-nama" class="form-control" readonly>
+
+                            {{-- Input hidden ini yang akan mengirimkan ID kategori ke server --}}
+                            <input type="hidden" name="kategori_id" id="edit-kategori_id">
+
                             <small class="form-text text-muted">Kategori tidak dapat diubah.</small>
                         </div>
                         <div class="form-group col-md-6">
