@@ -36,6 +36,8 @@ class RiwayatService extends Model
         'tanggal_selesai_service' => 'datetime',
     ];
 
+    // oke
+    
     /**
      * Mendefinisikan relasi ke model Aset.
      */
