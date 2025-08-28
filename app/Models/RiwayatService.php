@@ -26,6 +26,17 @@ class RiwayatService extends Model
     ];
 
     /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'tanggal_masuk_service'   => 'datetime',
+        'perkiraan_selesai'       => 'datetime',
+        'tanggal_selesai_service' => 'datetime',
+    ];
+
+    /**
      * Mendefinisikan relasi ke model Aset.
      */
     public function aset()
