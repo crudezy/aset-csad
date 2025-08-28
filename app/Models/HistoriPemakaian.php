@@ -29,6 +29,16 @@ class HistoriPemakaian extends Model
         'keterangan',
     ];
 
+     /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'tanggal_serah' => 'datetime',
+        'tanggal_kembali' => 'datetime',
+    ];
+
     /**
      * Mendefinisikan relasi "belongsTo" ke model Aset.
      * Setiap histori pemakaian dimiliki oleh satu aset.

@@ -15,6 +15,15 @@ class Aset extends Model
     protected $keyType = 'string';
     protected $guarded = []; // Izinkan mass assignment untuk semua field
 
+        /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'tanggal_pembelian' => 'datetime',
+    ];
+
     // Relasi ke Kategori
     public function kategori()
     {
